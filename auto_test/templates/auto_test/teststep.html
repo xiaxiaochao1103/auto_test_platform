@@ -1,0 +1,68 @@
+{% extends 'auto_test/base.html' %}
+{% block title %}测试步骤{% endblock %}
+
+{% block content %}
+    {% if request.session.is_login %}
+        <h1>你好,{{ request.session.user_name }}！欢迎回来！</h1>
+    {% endif %}
+    <br>
+
+
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>序号</th>
+                <th>用例名称</th>
+                <th>测试步骤序号</th>
+                <th>测试步骤描述</th>
+                <th>关键字</th>
+                <th>定位方式</th>
+                <th>定位表达式</th>
+                <th>测试数据</th>
+                <th>创建时间</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            {% for teststep in teststeps %}
+                <tr>
+                    <td>{{ teststep.id }}</td>
+                    <td>{{ teststep.test_case.name }}</td>
+                    <td>{{ teststep.test_step_no }}</td>
+                    <td>{{ teststep.desc }}</td>
+                    <td>{{ teststep.key_word }}</td>
+                    <td>{{ teststep.locator_method|default_if_none:"" }}</td>
+                    <td>{{ teststep.locator_exp|default_if_none:"" }}</td>
+                    <td>{{ teststep.test_data|default_if_none:"" }}</td>
+                    <td>{{ teststep.create_time|date:"Y-n-d H:i" }}</td>
+
+                </tr>
+            {% endfor %}
+
+
+            </tbody>
+        </table>
+    </div>
+
+    {# 实现分页标签的代码 #}
+    {# 这里使用 bootstrap 渲染页面 #}
+    <div id="pages" class="text-center">
+        <nav>
+            <ul class="pagination">
+                <li class="step-links">
+                    {% if teststeps.has_previous %}
+                        <a class='active' href="?page={{ teststeps.previous_page_number }}">上一页</a>
+                    {% endif %}
+
+                    <span class="current">
+                    第 {{ teststeps.number }} 页/共 {{ teststeps.paginator.num_pages }} 页</span>
+
+                    {% if teststeps.has_next %}
+                        <a class='active' href="?page={{ teststeps.next_page_number }}">下一页</a>
+                    {% endif %}
+                </li>
+            </ul>
+        </nav>
+    </div>
+{% endblock %}

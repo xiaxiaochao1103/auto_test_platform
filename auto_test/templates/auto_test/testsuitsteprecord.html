@@ -1,0 +1,77 @@
+{% extends 'auto_test/base.html' %}
+{% block title %}测试步骤执行结果{% endblock %}
+
+{% block content %}
+    {% if request.session.is_login %}
+        <h1>你好,{{ request.session.user_name }}！欢迎回来！</h1>
+    {% endif %}
+    <br>
+
+
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>运行序号</th>
+                <th>测试步骤序号</th>
+                <th>测试步骤描述</th>
+                <th>关键字</th>
+                <th>定位方式</th>
+                <th>定位表达式</th>
+                <th>测试数据</th>
+                <th>执行结果</th>
+                <th>执行步骤执行时间</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            {% for test_steps_record in test_steps_records %}
+                <tr>
+                    <td>{{ test_steps_record.id }}</td>
+                    <td>{{ test_steps_record.step_id.test_step_no }}</td>
+                    <td>{{ test_steps_record.step_id.desc }}</td>
+                    <td>{{ test_steps_record.step_id.key_word }}</td>
+                    <td>{{ test_steps_record.step_id.locator_method|default_if_none:"" }}</td>
+                    <td>{{ test_steps_record.step_id.locator_exp|default_if_none:"" }}</td>
+                    <td>{{ test_steps_record.step_id.test_data|default_if_none:"" }}</td>
+                    <td>{{ test_steps_record.result|default_if_none:"成功" }}</td>
+                    <td>{{ test_steps_record.create_time|date:"Y-n-d H:i" }}</td>
+                </tr>
+                {% if test_steps_record.exception_info %}
+                    <div>
+                        <p>{{ test_steps_record.exception_info }}<p>
+                        <img src="{{ MEDIA_URL }}{{ test_steps_record.capture_screen }} " height="300" width="800"
+                             align="center">
+                    </div>
+                {% endif %}
+            {% endfor %}
+            </tbody>
+        </table>
+
+
+    </div>
+
+
+    {# 实现分页标签的代码 #}
+    {# 这里使用 bootstrap 渲染页面 #}
+    <div id="pages" class="text-center">
+        <nav>
+            <ul class="pagination">
+                <li class="step-links">
+                    {% if test_steps_records.has_previous %}
+                        <a class='active' href="?page={{ test_steps_records.previous_page_number }}">上一页</a>
+                    {% endif %}
+
+                    <span class="current">
+                    第 {{ test_steps_records.number }} 页/共 {{ test_steps_records.paginator.num_pages }} 页</span>
+
+                    {% if test_steps_records.has_next %}
+                        <a class='active' href="?page={{ test_steps_records.next_page_number }}">下一页</a>
+                    {% endif %}
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+{% endblock %}
+

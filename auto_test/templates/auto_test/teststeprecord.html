@@ -1,0 +1,76 @@
+{% extends 'auto_test/base.html' %}
+{% block title %}测试步骤执行结果{% endblock %}
+
+{% block content %}
+    {% if request.session.is_login %}
+        <h1>你好,{{ request.session.user_name }}！欢迎回来！</h1>
+    {% endif %}
+    <br>
+
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>运行序号</th>
+                <th>测试步骤序号</th>
+                <th>测试步骤描述</th>
+                <th>关键字</th>
+                <th>定位方式</th>
+                <th>定位表达式</th>
+                <th>测试数据</th>
+                <th>执行结果</th>
+                <th>执行步骤执行时间</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            {% for test_step_result in test_step_results %}
+                <tr>
+                    <td>{{ test_step_result.id }}</td>
+                    <td>{{ test_step_result.case_step.test_step_no }}</td>
+                    <td>{{ test_step_result.case_step.desc }}</td>
+                    <td>{{ test_step_result.case_step.key_word }}</td>
+                    <td>{{ test_step_result.case_step.locator_method|default_if_none:"" }}</td>
+                    <td>{{ test_step_result.case_step.locator_exp|default_if_none:"" }}</td>
+                    <td>{{ test_step_result.case_step.test_data|default_if_none:"" }}</td>
+                    <td>{{ test_step_result.result }}</td>
+                    <td>{{ test_step_result.create_time|date:"Y-n-d H:i" }}</td>
+                </tr>
+                {% if test_step_result.exception_info %}
+                    <div>
+                        <p>{{ test_step_result.exception_info }}<p>
+                        <img src="{{ MEDIA_URL }}{{ test_step_result.capture_screen }} " height="300" width="800"
+                             align="center">
+                    </div>
+                {% endif %}
+
+            {% endfor %}
+            </tbody>
+        </table>
+
+
+    </div>
+
+
+    {# 实现分页标签的代码 #}
+    {# 这里使用 bootstrap 渲染页面 #}
+    <div id="pages" class="text-center">
+        <nav>
+            <ul class="pagination">
+                <li class="step-links">
+                    {% if test_step_results.has_previous %}
+                        <a class='active' href="?page={{ test_step_results.previous_page_number }}">上一页</a>
+                    {% endif %}
+
+                    <span class="current">
+                    第 {{ test_step_results.number }} 页/共 {{ test_step_results.paginator.num_pages }} 页</span>
+
+                    {% if test_step_results.has_next %}
+                        <a class='active' href="?page={{ test_step_results.next_page_number }}">下一页</a>
+                    {% endif %}
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+{% endblock %}
